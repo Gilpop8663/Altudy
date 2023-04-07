@@ -4,7 +4,7 @@ using namespace std;
 
 int t, n;
 
-string command[3] = {"+", "-", " "};
+string command[3] = {" ", "+", "-"};
 vector<int> arr;
 
 string trimString(string originString)
@@ -38,37 +38,48 @@ int calculate(int kind, int a, int b)
     return 0;
 }
 
-int calculateResult(string curString)
+pair<int, int> calculateNextNumber(int index, string curString)
 {
-    int result = 0;
-
     int curNumber = 0;
-
-    cout << curString << "\n";
-
-    for (int i = 0; i < n; i++)
+    int curIndex = 0;
+    for (int i = index; i < curString.size(); i++)
     {
+        curIndex = i;
+
         if (curString[i] == '+' || curString[i] == '-')
             break;
-        cout << curNumber << "\n";
+
         curNumber *= 10;
         curNumber += (int)curString[i] - '0';
     }
 
-    cout << curNumber << "\n";
+    return {curNumber, curIndex + 1};
+}
 
-    return curNumber;
+int calculateResult(string curString)
+{
+    int result = 0;
+    int curNumber = 0;
+    int curIndex = 0;
 
-    // for (int i = 0; i < curString.size(); i++)
-    // {
+    pair<int, int> cur = calculateNextNumber(curIndex, curString);
 
-    //     int curNumber = 0;
+    result = cur.first;
+    curIndex = cur.second;
 
-    //     if (curString[i] == '+' || curString[i] == '-')
-    //     {
-    //         result = calculate(curString[i], result, )
-    //     }
-    // }
+    while (curIndex < curString.size())
+    {
+
+        char curSign = curString[curIndex - 1];
+        pair<int, int> cur = calculateNextNumber(curIndex, curString);
+
+        curNumber = cur.first;
+        curIndex = cur.second;
+
+        result = calculate(curSign, result, curNumber);
+    }
+
+    return result;
 }
 
 string calculateString(int kind, string curString, int nextNumber)
@@ -82,7 +93,12 @@ void DFS(int k, string curString)
     if (k == n)
     {
 
-        cout << trimString(curString) << "\n";
+        string resultString = trimString(curString);
+        int result = calculateResult(resultString);
+        if (result == 0)
+        {
+            cout << curString << "\n";
+        }
 
         return;
     }
@@ -114,8 +130,7 @@ int main(void)
 
         string startString = to_string(arr[0]);
 
-        // DFS(1, startString);
-
-        calculateResult("12+3-4-56+7"); // -38
+        DFS(1, startString);
+        cout << "\n";
     }
 }
